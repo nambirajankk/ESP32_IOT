@@ -1,21 +1,106 @@
 <!DOCTYPE html>
-<html>
-<body>
-<br>
-<hr>
-<center>
-<button onclick="ledOn()">ON</button>
-<button onclick="ledOff()">OFF</button>
-</center>
-<script type="module">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        .led-glow {
+            box-shadow: 0 0 60px -10px rgb(74 222 128);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .btn-on {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-on:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        
+        .btn-off {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-off:hover {
+            transform: translateY(-4px) scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-auto p-8">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/10 rounded-3xl mb-4 border border-emerald-500/20">
+                <i class="fa-solid fa-lightbulb text-4xl text-emerald-400"></i>
+            </div>
+            <h1 class="text-4xl font-bold tracking-tight">LED Control</h1>
+            <p class="text-zinc-400 mt-2">Smart Home • Realtime Control</p>
+        </div>
 
-import { initializeApp } from
-"https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        <!-- Status Card -->
+        <div class="bg-zinc-900 rounded-3xl p-10 shadow-2xl border border-zinc-800 mb-8">
+            <div class="flex items-center justify-center gap-4 mb-8">
+                <div id="ledIndicator" 
+                     class="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xl transition-all duration-300">
+                    💡
+                </div>
+                <div>
+                    <div id="statusText" class="text-2xl font-semibold text-zinc-400">LED is OFF</div>
+                    <div id="statusSub" class="text-emerald-400 text-sm font-medium">Ready to control</div>
+                </div>
+            </div>
 
-import { getDatabase, ref, set }
-from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+            <!-- Visual LED -->
+            <div class="flex justify-center mb-10">
+                <div id="ledVisual" 
+                     class="w-32 h-32 rounded-3xl bg-zinc-800 flex items-center justify-center text-6xl transition-all duration-500 border-4 border-zinc-700">
+                    ⚪
+                </div>
+            </div>
 
-const firebaseConfig = {
+            <!-- Buttons -->
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="ledOn()" 
+                        class="btn-on bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-6 rounded-2xl text-xl flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/30">
+                    <i class="fa-solid fa-power-off"></i>
+                    TURN ON
+                </button>
+                
+                <button onclick="ledOff()" 
+                        class="btn-off bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-6 rounded-2xl text-xl flex items-center justify-center gap-3 border border-zinc-700">
+                    <i class="fa-solid fa-power-off"></i>
+                    TURN OFF
+                </button>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="text-center text-xs text-zinc-500 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Secured by Firebase • Realtime Updates</span>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+        const firebaseConfig = {
   apiKey: "AIzaSyDtpaYow0i1rPZyvVPJj9nBsj36GgA5c68",
   authDomain: "esp32-iot-e7363.firebaseapp.com",
   databaseURL: "https://esp32-iot-e7363-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -24,18 +109,60 @@ const firebaseConfig = {
   messagingSenderId: "374399284490",
   appId: "1:374399284490:web:1083398487db54421cf6f3"
 };
-const app = initializeApp(firebaseConfig);
-const db=getDatabase(app);
 
-window.ledOn=function(){
-  set(ref(db,"led"),1);
-}
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const ledRef = ref(db, "led");
 
-window.ledOff=function(){
-  set(ref(db,"led"),0);
-}
+        const ledVisual = document.getElementById('ledVisual');
+        const ledIndicator = document.getElementById('ledIndicator');
+        const statusText = document.getElementById('statusText');
+        const statusSub = document.getElementById('statusSub');
 
-</script>
+        // Listen for realtime changes
+        onValue(ledRef, (snapshot) => {
+            const state = snapshot.val();
+            updateUI(state);
+        });
 
+        function updateUI(state) {
+            if (state === 1) {
+                // LED ON
+                ledVisual.innerHTML = '🟢';
+                ledVisual.classList.add('led-glow', 'border-emerald-400', 'bg-emerald-950');
+                ledVisual.classList.remove('border-zinc-700', 'bg-zinc-800');
+                
+                ledIndicator.innerHTML = '🟢';
+                ledIndicator.classList.add('bg-emerald-400');
+                
+                statusText.textContent = "LED is ON";
+                statusText.classList.add('text-emerald-400');
+                statusSub.textContent = "Everything looks bright ✨";
+            } else {
+                // LED OFF
+                ledVisual.innerHTML = '⚪';
+                ledVisual.classList.remove('led-glow', 'border-emerald-400', 'bg-emerald-950');
+                ledVisual.classList.add('border-zinc-700', 'bg-zinc-800');
+                
+                ledIndicator.innerHTML = '⚪';
+                ledIndicator.classList.remove('bg-emerald-400');
+                
+                statusText.textContent = "LED is OFF";
+                statusText.classList.remove('text-emerald-400');
+                statusSub.textContent = "Ready to control";
+            }
+        }
+
+        window.ledOn = function() {
+            set(ledRef, 1);
+        }
+
+        window.ledOff = function() {
+            set(ledRef, 0);
+        }
+
+        // Initial state
+        updateUI(0);
+    </script>
 </body>
 </html>
