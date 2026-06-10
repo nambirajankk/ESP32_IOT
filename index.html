@@ -3,166 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LED Control Panel</title>
+    <title>NEXUS • IoT Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Exo+2:wght@500;600;700&display=swap');
         
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #0a0f1c 0%, #02040a 70%);
+            min-height: 100vh;
+        }
+        .title-font { font-family: 'Exo 2', sans-serif; }
+        
+        .glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
         }
         
-        .led-glow {
-            box-shadow: 0 0 60px -10px rgb(74 222 128);
-            animation: pulse 2s infinite;
+        .device-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        .device-card:hover {
+            transform: translateY(-8px);
         }
-        
-        .btn-on {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .toggle-track {
+            transition: all 0.4s ease;
         }
-        
-        .btn-on:hover {
-            transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        .track-on {
+            background-color: #4ade80 !important;
         }
-        
-        .btn-off {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .toggle-knob {
+            transition: all 0.4s ease;
         }
-        
-        .btn-off:hover {
-            transform: translateY(-4px) scale(1.05);
+        .knob-on {
+            background-color: white !important;
+            box-shadow: 0 0 25px white, 0 0 40px rgba(252, 253, 252, 0.7);
         }
     </style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full mx-auto p-8">
+<body class="text-white pb-12">
+    <div class="max-w-6xl mx-auto p-6">
         <!-- Header -->
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/10 rounded-3xl mb-4 border border-emerald-500/20">
-                <i class="fa-solid fa-lightbulb text-4xl text-emerald-400"></i>
+        <div class="flex justify-between items-center mb-12 sticky top-0 bg-[#02040a]/90 backdrop-blur-md py-5 z-20 border-b border-white/10">
+            <div>
+                <h1 class="title-font text-6xl font-bold tracking-[-3px] bg-gradient-to-r from-emerald-300 via-cyan-200 to-white bg-clip-text text-transparent">NEXUS</h1>
+                <p class="text-emerald-400/70 text-sm tracking-[4px] font-medium">INTELLIGENT CONTROL SYSTEM</p>
             </div>
-            <h1 class="text-4xl font-bold tracking-tight">LED Control</h1>
-            <p class="text-zinc-400 mt-2">Smart Home • Realtime Control</p>
-        </div>
-
-        <!-- Status Card -->
-        <div class="bg-zinc-900 rounded-3xl p-10 shadow-2xl border border-zinc-800 mb-8">
-            <div class="flex items-center justify-center gap-4 mb-8">
-                <div id="ledIndicator" 
-                     class="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xl transition-all duration-300">
-                    💡
-                </div>
-                <div>
-                    <div id="statusText" class="text-2xl font-semibold text-zinc-400">LED is OFF</div>
-                    <div id="statusSub" class="text-emerald-400 text-sm font-medium">Ready to control</div>
-                </div>
-            </div>
-
-            <!-- Visual LED -->
-            <div class="flex justify-center mb-10">
-                <div id="ledVisual" 
-                     class="w-32 h-32 rounded-3xl bg-zinc-800 flex items-center justify-center text-6xl transition-all duration-500 border-4 border-zinc-700">
-                    ⚪
-                </div>
-            </div>
-
-            <!-- Buttons -->
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="ledOn()" 
-                        class="btn-on bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-6 rounded-2xl text-xl flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/30">
-                    <i class="fa-solid fa-power-off"></i>
-                    TURN ON
+            <div class="flex gap-4">
+                <button onclick="showAddModal()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-8 py-4 rounded-3xl flex items-center gap-3 font-semibold text-lg shadow-xl shadow-emerald-500/30 transition-all active:scale-95">
+                    <i class="fa-solid fa-plus"></i> ADD DEVICE
                 </button>
-                
-                <button onclick="ledOff()" 
-                        class="btn-off bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-6 rounded-2xl text-xl flex items-center justify-center gap-3 border border-zinc-700">
-                    <i class="fa-solid fa-power-off"></i>
-                    TURN OFF
+                <button onclick="showWifiModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-8 py-4 rounded-3xl flex items-center gap-3 font-semibold text-lg shadow-xl shadow-amber-500/30 transition-all active:scale-95">
+                    <i class="fa-solid fa-wifi"></i> WiFi Settings
                 </button>
             </div>
         </div>
 
-        <!-- Info -->
-        <div class="text-center text-xs text-zinc-500 flex items-center justify-center gap-2">
-            <i class="fa-solid fa-shield-halved"></i>
-            <span>Secured by Firebase • Realtime Updates</span>
+        <div id="devicesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- Add Device Modal -->
+    <div id="addModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div class="glass rounded-3xl p-10 w-full max-w-md mx-4">
+            <h2 class="text-3xl font-bold mb-8">Add New Device</h2>
+            <input id="deviceName" type="text" placeholder="Device Name" class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 mb-6 text-lg focus:outline-none focus:border-emerald-500">
+            
+            <select id="deviceType" class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 mb-6 text-lg focus:outline-none focus:border-emerald-500">
+                <option value="led">LED / Light</option>
+                <option value="fan">Fan</option>
+                <option value="other">Other Device</option>
+            </select>
+
+            <select id="gpioPin" class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 mb-8 text-lg focus:outline-none focus:border-emerald-500">
+                <option value="2">GPIO 2</option>
+                <option value="4">GPIO 4</option>
+                <option value="5">GPIO 5</option>
+                <option value="12">GPIO 12</option>
+                <option value="13">GPIO 13</option>
+                <option value="14">GPIO 14</option>
+                <option value="15">GPIO 15</option>
+                <option value="16">GPIO 16</option>
+                <option value="17">GPIO 17</option>
+                <option value="18">GPIO 18</option>
+                <option value="19">GPIO 19</option>
+                <option value="21">GPIO 21</option>
+                <option value="22">GPIO 22</option>
+                <option value="23">GPIO 23</option>
+                <option value="25">GPIO 25</option>
+                <option value="26">GPIO 26</option>
+                <option value="27">GPIO 27</option>
+            </select>
+
+            <div class="flex gap-4">
+                <button onclick="hideAddModal()" class="flex-1 py-6 bg-zinc-800 hover:bg-zinc-700 rounded-3xl font-medium text-lg">Cancel</button>
+                <button onclick="addNewDevice()" class="flex-1 py-6 bg-emerald-600 hover:bg-emerald-500 rounded-3xl font-semibold text-lg">Add Device</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="wifiModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div class="glass rounded-3xl p-10 w-full max-w-md mx-4">
+            <h2 class="text-3xl font-bold mb-8">WiFi Configuration</h2>
+            <input id="wifiSSID" type="text" placeholder="WiFi SSID (Network Name)" class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 mb-6 text-lg">
+            <div class="relative mb-8">
+                <input id="wifiPassword" type="password" placeholder="WiFi Password" 
+                class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 pr-12 text-lg">
+                <button type="button" onclick="togglePassword()" 
+                class="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white">
+            <i id="eyeIcon" class="fa-solid fa-eye"></i>
+            </button>
+        </div>
+            <div class="flex gap-4">
+                <button onclick="hideWifiModal()" class="flex-1 py-6 bg-zinc-800 hover:bg-zinc-700 rounded-3xl font-medium text-lg">Cancel</button>
+                <button onclick="saveWifiConfig()" class="flex-1 py-6 bg-amber-600 hover:bg-amber-500 rounded-3xl font-semibold text-lg">Save & Connect</button>
+            </div>
+            <p class="text-center text-sm text-zinc-500 mt-6">ESP32 will restart and connect to new network</p>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, remove, push } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
         const firebaseConfig = {
-  apiKey: "AIzaSyDtpaYow0i1rPZyvVPJj9nBsj36GgA5c68",
-  authDomain: "esp32-iot-e7363.firebaseapp.com",
-  databaseURL: "https://esp32-iot-e7363-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "esp32-iot-e7363",
-  storageBucket: "esp32-iot-e7363.firebasestorage.app",
-  messagingSenderId: "374399284490",
-  appId: "1:374399284490:web:1083398487db54421cf6f3"
-};
+            apiKey: "AIzaSyDtpaYow0i1rPZyvVPJj9nBsj36GgA5c68",
+            authDomain: "esp32-iot-e7363.firebaseapp.com",
+            databaseURL: "https://esp32-iot-e7363-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "esp32-iot-e7363",
+            storageBucket: "esp32-iot-e7363.firebasestorage.app",
+            messagingSenderId: "374399284490",
+            appId: "1:374399284490:web:1083398487db54421cf6f3"
+        };
+
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const ledRef = ref(db, "led");
+        const devicesRef = ref(db, "devices");
 
-        const ledVisual = document.getElementById('ledVisual');
-        const ledIndicator = document.getElementById('ledIndicator');
-        const statusText = document.getElementById('statusText');
-        const statusSub = document.getElementById('statusSub');
+        const devicesList = document.getElementById('devicesList');
 
-        // Listen for realtime changes
-        onValue(ledRef, (snapshot) => {
-            const state = snapshot.val();
-            updateUI(state);
-        });
+        function createDeviceCard(key, data) {
+            const isOn = data?.status === 1;
+            const voltage = data?.voltage ?? 100;
+            let icon = 'fa-lightbulb';
+            if (data?.type === 'fan') icon = 'fa-fan';
+            else if (data?.type === 'other') icon = 'fa-bolt';
 
-        function updateUI(state) {
-            if (state === 1) {
-                // LED ON
-                ledVisual.innerHTML = '🟢';
-                ledVisual.classList.add('led-glow', 'border-emerald-400', 'bg-emerald-950');
-                ledVisual.classList.remove('border-zinc-700', 'bg-zinc-800');
-                
-                ledIndicator.innerHTML = '🟢';
-                ledIndicator.classList.add('bg-emerald-400');
-                
-                statusText.textContent = "LED is ON";
-                statusText.classList.add('text-emerald-400');
-                statusSub.textContent = "Everything looks bright ✨";
-            } else {
-                // LED OFF
-                ledVisual.innerHTML = '⚪';
-                ledVisual.classList.remove('led-glow', 'border-emerald-400', 'bg-emerald-950');
-                ledVisual.classList.add('border-zinc-700', 'bg-zinc-800');
-                
-                ledIndicator.innerHTML = '⚪';
-                ledIndicator.classList.remove('bg-emerald-400');
-                
-                statusText.textContent = "LED is OFF";
-                statusText.classList.remove('text-emerald-400');
-                statusSub.textContent = "Ready to control";
+            return `
+                <div class="device-card glass rounded-3xl p-7">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="flex items-center gap-5">
+                            <i class="fa-solid ${icon} text-5xl ${isOn ? 'text-[#2CFF05]' : 'text-slate-400'}"></i>
+                            <div>
+                                <div class="font-semibold text-2xl">${data?.name || 'Unnamed Device'}</div>
+                                <div class="text-emerald-400/70 text-sm tracking-wider">${data?.type?.toUpperCase() || 'DEVICE'}</div>
+                                <div class="text-[10px] text-zinc-400 mt-1">GPIO ${data?.pin ?? 'N/A'}</div>
+                            </div>
+                        </div>
+                        <button onclick="deleteDevice('${key}')" class="text-red-400 hover:text-red-500 text-2xl p-3">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <!-- Power Toggle -->
+                    <div onclick="toggleDevice('${key}', ${isOn ? 1 : 0})" 
+                         class="cursor-pointer mb-8 bg-zinc-950 hover:bg-zinc-900 rounded-3xl p-6 flex items-center justify-between text-xl font-semibold">
+                        <span class="${isOn ? 'text-[#2CFF05]' : 'text-zinc-500'}">
+                            ${isOn ? '🟢 POWER ON' : '⚪ POWER OFF'}
+                        </span>
+                        <div class="toggle-track w-14 h-8 bg-zinc-700 rounded-full relative ${isOn ? 'track-on' : ''}">
+                            <div class="toggle-knob absolute top-1 w-6 h-6 bg-white rounded-full shadow-lg transition-all 
+                                 ${isOn ? 'right-1 knob-on' : 'left-1 bg-zinc-400'}"></div>
+                        </div>
+                    </div>
+
+                    <!-- Voltage Control -->
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-zinc-400 text-sm tracking-wider">INTENSITY</span>
+                            <span onclick="editVoltage('${key}', this)" id="volt-${key}" 
+                                  class="font-mono text-xl font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300">
+                                ${voltage}%
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button onclick="adjustVoltage('${key}', -5)" class="w-11 h-11 bg-zinc-800 hover:bg-red-600 rounded-2xl text-2xl font-bold">-</button>
+                            <input type="range" id="slider-${key}" min="0" max="100" value="${voltage}" step="1" class="flex-1 accent-[#2CFF05] cursor-pointer">
+                            <button onclick="adjustVoltage('${key}', 5)" class="w-11 h-11 bg-zinc-800 hover:bg-[#305CDE] rounded-2xl text-2xl font-bold">+</button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function updateDevices(snapshot) {
+            devicesList.innerHTML = "";
+            const devices = snapshot.val() || {};
+
+            if (Object.keys(devices).length === 0) {
+                devicesList.innerHTML = `<div class="text-center py-32 text-zinc-500 col-span-full">No devices yet.<br>Click ADD DEVICE</div>`;
+                return;
             }
+
+            Object.entries(devices).forEach(([key, data]) => {
+                devicesList.innerHTML += createDeviceCard(key, data);
+                setTimeout(() => attachSliderListener(key), 50);
+            });
         }
 
-        window.ledOn = function() {
-            set(ledRef, 1);
+        function attachSliderListener(key) {
+            const slider = document.getElementById(`slider-${key}`);
+            if (slider) slider.addEventListener('input', () => updateVoltage(key, slider.value));
         }
 
-        window.ledOff = function() {
-            set(ledRef, 0);
-        }
+        window.updateVoltage = (key, value) => {
+            set(ref(db, `devices/${key}/voltage`), parseInt(value));
+            const voltEl = document.getElementById(`volt-${key}`);
+            if (voltEl) voltEl.textContent = value + "%";
+        };
 
-        // Initial state
-        updateUI(0);
+        window.adjustVoltage = (key, change) => {
+            const el = document.getElementById(`volt-${key}`);
+            let current = parseInt(el.textContent) || 100;
+            let newVal = Math.max(0, Math.min(100, current + change));
+            updateVoltage(key, newVal);
+            const slider = document.getElementById(`slider-${key}`);
+            if (slider) slider.value = newVal;
+        };
+
+        window.editVoltage = (key, el) => {
+            const current = parseInt(el.textContent) || 100;
+            const newVal = prompt("Enter intensity (0-100):", current);
+            if (newVal !== null) {
+                let value = parseInt(newVal);
+                if (!isNaN(value)) {
+                    value = Math.max(0, Math.min(100, value));
+                    updateVoltage(key, value);
+                    const slider = document.getElementById(`slider-${key}`);
+                    if (slider) slider.value = value;
+                }
+            }
+        };
+
+        window.toggleDevice = (key, current) => set(ref(db, `devices/${key}/status`), current === 1 ? 0 : 1);
+        
+        window.addNewDevice = () => {
+            const name = document.getElementById('deviceName').value.trim();
+            if (!name) return alert("Please enter device name");
+            
+            const newRef = push(devicesRef);
+            set(newRef, {
+                name: name,
+                type: document.getElementById('deviceType').value,
+                pin: parseInt(document.getElementById('gpioPin').value),
+                status: 0,
+                voltage: 100
+            }).then(() => {
+                hideAddModal();
+                document.getElementById('deviceName').value = '';
+            });
+        };
+
+        // ================== WiFi Configuration ==================
+        let passwordVisible = false;
+
+        window.togglePassword = () => {
+            const passwordField = document.getElementById('wifiPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            passwordVisible = !passwordVisible;
+            if (passwordVisible) {
+                passwordField.type = "text";
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            }
+            else{
+                passwordField.type = "password";
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        };
+        window.showWifiModal = () => document.getElementById('wifiModal').classList.remove('hidden');
+        window.hideWifiModal = () => document.getElementById('wifiModal').classList.add('hidden');
+
+        window.saveWifiConfig = () => {
+            const ssid = document.getElementById('wifiSSID').value.trim();
+            const pass = document.getElementById('wifiPassword').value.trim();
+            
+            if (!ssid) return alert("Please enter WiFi SSID");
+
+            const wifiRef = ref(db, "wifiConfig");
+            set(wifiRef, {
+                ssid: ssid,
+                password: pass,
+                updatedAt: Date.now()
+            }).then(() => {
+                alert("✅ WiFi settings saved! ESP32 will restart and connect to new network.");
+                hideWifiModal();
+            }).catch(err => alert("Error saving WiFi config"));
+        };
+
+        window.deleteDevice = (key) => { if(confirm("Delete this device?")) remove(ref(db, `devices/${key}`)); };
+        window.showAddModal = () => document.getElementById('addModal').classList.remove('hidden');
+        window.hideAddModal = () => document.getElementById('addModal').classList.add('hidden');
+
+        onValue(devicesRef, updateDevices);
     </script>
 </body>
 </html>
