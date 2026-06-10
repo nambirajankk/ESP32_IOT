@@ -226,7 +226,10 @@
 
         window.adjustVoltage = (key, change) => {
             const el = document.getElementById(`volt-${key}`);
-            let current = parseInt(el.textContent) || 100;
+            let current = parseInt(el.textContent);
+            if (isNaN(current)) {
+                current = 100;
+            }
             let newVal = Math.max(0, Math.min(100, current + change));
             updateVoltage(key, newVal);
             const slider = document.getElementById(`slider-${key}`);
@@ -234,7 +237,10 @@
         };
 
         window.editVoltage = (key, el) => {
-            const current = parseInt(el.textContent) || 100;
+            let current = parseInt(el.textContent);
+            if(isNaN(current)){
+                current = 100;
+            }
             const newVal = prompt("Enter intensity (0-100):", current);
             if (newVal !== null) {
                 let value = parseInt(newVal);
