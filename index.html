@@ -150,15 +150,12 @@
 
         const devicesList = document.getElementById('devicesList');
 
-        // ================== Auth Guard ==================
-        // If nobody is logged in, bounce to the login page.
-        // Only start listening to the devices data once we know a user is signed in,
-        // otherwise the Firebase rules will reject the read anyway.
+       
         let unsubscribeDevices = null;
 
         onAuthStateChanged(auth, (user) => {
             if (!user) {
-                window.location.href = "test_login.html";
+                window.location.href = "login.html";
                 return;
             }
             const displayName = user.displayName || user.email.split('@')[0];
