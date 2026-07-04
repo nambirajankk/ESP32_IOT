@@ -272,7 +272,7 @@
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     await updateProfile(userCredential.user, { displayName: username });
                 }
-                window.location.href = "index.html";   // ← Fixed
+                window.location.href = "index.html";
             } catch (err) {
                 setLoading(false);
                 showMsg(err.message || 'Something went wrong.');
