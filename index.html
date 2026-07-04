@@ -52,12 +52,16 @@
                 <h1 class="title-font text-6xl font-bold tracking-[-3px] bg-gradient-to-r from-emerald-300 via-cyan-200 to-white bg-clip-text text-transparent">NEXUS</h1>
                 <p class="text-emerald-400/70 text-sm tracking-[4px] font-medium">INTELLIGENT CONTROL SYSTEM</p>
             </div>
-            <div class="flex gap-4">
+            <div class="flex gap-4 items-center">
+                <span id="userWelcome" onclick="editUsername()" class="text-zinc-300 text-sm mr-2 font-medium cursor-pointer hover:text-emerald-400 transition-colors" title="Click to edit your username"></span>
                 <button onclick="showAddModal()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-8 py-4 rounded-3xl flex items-center gap-3 font-semibold text-lg shadow-xl shadow-emerald-500/30 transition-all active:scale-95">
                     <i class="fa-solid fa-plus"></i> ADD DEVICE
                 </button>
                 <button onclick="showWifiModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-8 py-4 rounded-3xl flex items-center gap-3 font-semibold text-lg shadow-xl shadow-amber-500/30 transition-all active:scale-95">
                     <i class="fa-solid fa-wifi"></i> WiFi Settings
+                </button>
+                <button onclick="handleLogout()" class="bg-zinc-800 hover:bg-red-600 px-6 py-4 rounded-3xl flex items-center gap-3 font-semibold text-lg transition-all active:scale-95">
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
             </div>
         </div>
@@ -123,10 +127,10 @@
             <p class="text-center text-sm text-zinc-500 mt-6">ESP32 will restart and connect to new network</p>
         </div>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, remove, push } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDtpaYow0i1rPZyvVPJj9nBsj36GgA5c68",
@@ -141,9 +145,46 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
         const devicesRef = ref(db, "devices");
 
         const devicesList = document.getElementById('devicesList');
+
+        // ================== Auth Guard ==================
+        // If nobody is logged in, bounce to the login page.
+        // Only start listening to the devices data once we know a user is signed in,
+        // otherwise the Firebase rules will reject the read anyway.
+        let unsubscribeDevices = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "test_login.html";
+                return;
+            }
+            const displayName = user.displayName || user.email.split('@')[0];
+            document.getElementById('userWelcome').textContent = `Welcome back, ${displayName}`;
+
+            window.editUsername = () => {
+                const current = auth.currentUser.displayName || '';
+                const newName = prompt("Enter your username:", current);
+                if (newName !== null && newName.trim()) {
+                    updateProfile(auth.currentUser, { displayName: newName.trim() }).then(() => {
+                        document.getElementById('userWelcome').textContent = `Welcome back, ${newName.trim()}`;
+                    });
+                }
+            };
+            if (!unsubscribeDevices) {
+                unsubscribeDevices = onValue(devicesRef, updateDevices);
+            }
+        });
+
+        window.handleLogout = () => {
+            if (unsubscribeDevices) {
+                unsubscribeDevices();
+                unsubscribeDevices = null;
+            }
+            signOut(auth);
+        };
 
         function createDeviceCard(key, data) {
             const isOn = data?.status === 1;
@@ -313,8 +354,6 @@
         window.deleteDevice = (key) => { if(confirm("Delete this device?")) remove(ref(db, `devices/${key}`)); };
         window.showAddModal = () => document.getElementById('addModal').classList.remove('hidden');
         window.hideAddModal = () => document.getElementById('addModal').classList.add('hidden');
-
-        onValue(devicesRef, updateDevices);
     </script>
 </body>
 </html>
