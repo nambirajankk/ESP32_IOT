@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Exo+2:wght@500;600;700&display=swap');
-        
+       
         body {
             font-family: 'Inter', sans-serif;
             background: radial-gradient(circle at center, #0a0f1c 0%, #02040a 70%);
@@ -16,18 +16,15 @@
             color: white;
         }
         .title-font { font-family: 'Exo 2', sans-serif; }
-
         .glass {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(40px);
             border: 1px solid rgba(148, 163, 184, 0.2);
         }
-
         .glass-left {
             background: linear-gradient(165deg, rgba(16, 25, 45, 0.95), rgba(5, 15, 35, 0.9));
             border-right: 1px solid rgba(148, 163, 184, 0.15);
         }
-
         .uf {
             background: transparent;
             border: none;
@@ -45,7 +42,6 @@
         .uf::placeholder {
             color: rgba(163, 163, 163, 0.6);
         }
-
         .btn-primary {
             background: linear-gradient(to right, #10b981, #14b8a6);
             transition: all 0.3s ease;
@@ -54,10 +50,8 @@
             transform: translateY(-2px);
             box-shadow: 0 20px 25px -5px rgb(16 185 129 / 0.4);
         }
-
         .checkbox-custom {
-            width: 20px;
-            height: 20px;
+            width: 20px; height: 20px;
             border: 2px solid #64748b;
             border-radius: 6px;
             display: inline-flex;
@@ -75,7 +69,6 @@
 <body>
     <div class="min-h-screen flex items-center justify-center p-6">
         <div class="glass rounded-3xl overflow-hidden w-full max-w-4xl grid md:grid-cols-2 shadow-2xl">
-
             <!-- Left Panel -->
             <div class="glass-left p-12 md:p-16 flex flex-col justify-between">
                 <div>
@@ -83,10 +76,9 @@
                         <i class="fa-solid fa-bolt text-emerald-400 text-4xl"></i>
                         <h1 class="title-font text-5xl font-bold tracking-[-2px] bg-gradient-to-r from-emerald-300 via-cyan-200 to-white bg-clip-text text-transparent">NEXUS</h1>
                     </div>
-                    <h2 class="text-4xl font-semibold leading-tight mb-4">Welcome back, Explorer.</h2>
+                    <h2 class="text-4xl font-semibold leading-tight mb-4">Welcome back,<br>Explorer.</h2>
                     <p class="text-emerald-400/70 text-lg">Sign in to access your intelligent control system.</p>
                 </div>
-
                 <div class="space-y-6 mt-12">
                     <div class="flex items-center gap-4 text-emerald-400/80">
                         <i class="fa-solid fa-microchip text-xl"></i>
@@ -106,19 +98,15 @@
             <!-- Right: Login Form -->
             <div class="p-12 md:p-16 flex flex-col justify-center">
                 <div id="authMsg" class="hidden mb-6 px-5 py-4 rounded-2xl text-sm"></div>
-
                 <div class="space-y-8">
-                    <!-- Username field (only for signup) -->
                     <div id="usernameWrap" class="hidden">
                         <label class="text-xs uppercase tracking-widest text-zinc-400 mb-2 block">Username</label>
                         <input id="username" type="text" placeholder="Username" class="uf">
                     </div>
-
                     <div>
                         <label class="text-xs uppercase tracking-widest text-zinc-400 mb-2 block">Email Address</label>
                         <input id="email" type="email" placeholder="Enter a valid Email" class="uf">
                     </div>
-
                     <div class="relative">
                         <label class="text-xs uppercase tracking-widest text-zinc-400 mb-2 block">Password</label>
                         <input id="password" type="password" placeholder="Enter a Strong Password" class="uf pr-12">
@@ -126,12 +114,10 @@
                             <i id="pwEyeIcon" class="fa-solid fa-eye"></i>
                         </button>
                     </div>
-
                     <div id="confirmWrap" class="hidden">
                         <label class="text-xs uppercase tracking-widest text-zinc-400 mb-2 block">Confirm Password</label>
                         <input id="confirmPassword" type="password" placeholder="••••••••" class="uf">
                     </div>
-
                     <div id="signinExtras" class="flex justify-between items-center text-sm">
                         <label onclick="toggleRemember()" class="flex items-center gap-3 cursor-pointer select-none">
                             <span id="rememberBox" class="checkbox-custom">
@@ -141,15 +127,13 @@
                         </label>
                         <button onclick="handleForgotPassword()" class="text-emerald-400 hover:text-emerald-300">Forgot password?</button>
                     </div>
-
-                    <button id="submitBtn" onclick="handleSubmit()" 
+                    <button id="submitBtn" onclick="handleSubmit()"
                             class="btn-primary w-full py-6 rounded-3xl font-semibold text-lg tracking-wide flex items-center justify-center gap-3">
                         <span id="submitLabel">SIGN IN</span>
                     </button>
-
                     <p class="text-center text-zinc-400 text-sm">
-                        <span id="switchPrompt">Don't have an account?</span> 
-                        <button onclick="switchTab(window.currentMode === 'signin' ? 'signup' : 'signin')" 
+                        <span id="switchPrompt">Don't have an account?</span>
+                        <button onclick="switchTab(window.currentMode === 'signin' ? 'signup' : 'signin')"
                                 id="switchAction" class="text-emerald-400 hover:underline font-medium">Sign up</button>
                     </p>
                 </div>
@@ -186,7 +170,6 @@
 
         let currentMode = 'signin';
         let rememberMe = true;
-        let isSubmitting = false;
         window.currentMode = currentMode;
 
         window.switchTab = (target) => {
@@ -239,9 +222,7 @@
             const el = document.getElementById('authMsg');
             el.textContent = text;
             el.className = `mb-6 px-5 py-4 rounded-2xl text-sm font-medium ${
-                type === 'error' 
-                ? 'bg-red-500/10 border border-red-500/30 text-red-400' 
-                : 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+                type === 'error' ? 'bg-red-500/10 border border-red-500/30 text-red-400' : 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
             }`;
             el.classList.remove('hidden');
         }
@@ -282,7 +263,6 @@
             }
 
             setLoading(true);
-            isSubmitting = true;
             try {
                 await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
                 
@@ -290,40 +270,31 @@
                     await signInWithEmailAndPassword(auth, email, password);
                 } else {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    // Update display name BEFORE navigating away
-                    await updateProfile(userCredential.user, {
-                        displayName: username
-                    });
+                    await updateProfile(userCredential.user, { displayName: username });
                 }
-                window.location.href = "index_claude.html";
+                window.location.href = "index.html";   // ← Fixed
             } catch (err) {
-                isSubmitting = false;
                 setLoading(false);
-                showMsg(err.message || 'Something went wrong. Please try again.');
+                showMsg(err.message || 'Something went wrong.');
             }
         };
 
         window.handleForgotPassword = async () => {
             hideMsg();
             const email = document.getElementById('email').value.trim();
-            if (!email) {
-                showMsg('Please enter your email first.');
-                return;
-            }
+            if (!email) return showMsg('Please enter your email first.');
             try {
                 await sendPasswordResetEmail(auth, email);
-                showMsg('Password reset email sent. Check your inbox.', 'success');
+                showMsg('Password reset email sent.', 'success');
             } catch (err) {
                 showMsg(err.message);
             }
         };
 
-        window.onload = () => {
-            toggleRemember();
-        };
+        window.onload = () => toggleRemember();
 
         onAuthStateChanged(auth, (user) => {
-            if (user && !isSubmitting) {
+            if (user) {
                 window.location.href = "index.html";
             }
         });
