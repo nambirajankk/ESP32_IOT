@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS • IoT Control</title>
+    <title>NEXUS • Sign In</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
@@ -13,124 +13,163 @@
             font-family: 'Inter', sans-serif;
             background: radial-gradient(circle at center, #0a0f1c 0%, #02040a 70%);
             min-height: 100vh;
+            color: white;
         }
         .title-font { font-family: 'Exo 2', sans-serif; }
-        
+
         .glass {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(40px);
             border: 1px solid rgba(148, 163, 184, 0.2);
         }
-        
-        .device-card {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .device-card:hover {
-            transform: translateY(-8px);
+
+        .glass-left {
+            background: linear-gradient(165deg, rgba(16, 25, 45, 0.95), rgba(5, 15, 35, 0.9));
+            border-right: 1px solid rgba(148, 163, 184, 0.15);
         }
 
-        .toggle-track {
-            transition: all 0.4s ease;
+        .uf {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(148, 163, 184, 0.4);
+            padding: 12px 4px;
+            font-size: 1.1rem;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
         }
-        .track-on {
-            background-color: #4ade80 !important;
+        .uf:focus {
+            outline: none;
+            border-bottom-color: #4ade80;
         }
-        .toggle-knob {
-            transition: all 0.4s ease;
+        .uf::placeholder {
+            color: rgba(163, 163, 163, 0.6);
         }
-        .knob-on {
-            background-color: white !important;
-            box-shadow: 0 0 25px white, 0 0 40px rgba(252, 253, 252, 0.7);
+
+        .btn-primary {
+            background: linear-gradient(to right, #10b981, #14b8a6);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(16 185 129 / 0.4);
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #64748b;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checkbox-custom.checked {
+            background: #4ade80;
+            border-color: #4ade80;
         }
     </style>
 </head>
-<body class="text-white pb-12">
-    <div class="max-w-6xl mx-auto p-6">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-12 sticky top-0 bg-[#02040a]/90 backdrop-blur-md py-5 z-20 border-b border-white/10">
-            <div>
-                <h1 class="title-font text-6xl font-bold tracking-[-3px] bg-gradient-to-r from-emerald-300 via-cyan-200 to-white bg-clip-text text-transparent">NEXUS</h1>
-                <p class="text-emerald-400/70 text-sm tracking-[4px] font-medium">INTELLIGENT CONTROL SYSTEM</p>
+<body>
+    <div class="min-h-screen flex items-center justify-center p-6">
+        <div class="glass rounded-3xl overflow-hidden w-full max-w-4xl grid md:grid-cols-2 shadow-2xl">
+
+            <!-- Left Panel -->
+            <div class="glass-left p-12 md:p-16 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-10">
+                        <i class="fa-solid fa-bolt text-emerald-400 text-4xl"></i>
+                        <h1 class="title-font text-5xl font-bold tracking-[-2px] bg-gradient-to-r from-emerald-300 via-cyan-200 to-white bg-clip-text text-transparent">NEXUS</h1>
+                    </div>
+                    <h2 class="text-4xl font-semibold leading-tight mb-4">Welcome back, Explorer.</h2>
+                    <p class="text-emerald-400/70 text-lg">Sign in to access your intelligent control system.</p>
+                </div>
+
+                <div class="space-y-6 mt-12">
+                    <div class="flex items-center gap-4 text-emerald-400/80">
+                        <i class="fa-solid fa-microchip text-xl"></i>
+                        <span class="text-sm">Real-time device synchronization</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-emerald-400/80">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                        <span class="text-sm">Secure Firebase authentication</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-emerald-400/80">
+                        <i class="fa-solid fa-network-wired text-xl"></i>
+                        <span class="text-sm">ESP32 multi-device control</span>
+                    </div>
+                </div>
             </div>
-            <div class="flex gap-4 items-center">
-                <span id="userWelcome" onclick="editUsername()" class="text-zinc-300 text-sm mr-2 font-medium cursor-pointer hover:text-emerald-400 transition-colors" title="Click to edit your username"></span>
-                <button onclick="showAddModal()" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-8 py-4 rounded-3xl flex items-center gap-3 font-semibold text-lg shadow-xl shadow-emerald-500/30 transition-all active:scale-95">
-                    <i class="fa-solid fa-plus"></i> ADD DEVICE
-                </button>
-                <button onclick="showWifiModal()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-8 py-4 rounded-3xl flex items-center gap-3 font-semibold text-lg shadow-xl shadow-amber-500/30 transition-all active:scale-95">
-                    <i class="fa-solid fa-wifi"></i> WiFi Settings
-                </button>
-                <button onclick="handleLogout()" class="bg-zinc-800 hover:bg-red-600 px-6 py-4 rounded-3xl flex items-center gap-3 font-semibold text-lg transition-all active:scale-95">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
+
+            <!-- Right: Login Form -->
+            <div class="p-12 md:p-16 flex flex-col justify-center">
+                <div id="authMsg" class="hidden mb-6 px-5 py-4 rounded-2xl text-sm"></div>
+
+                <div class="space-y-8">
+                    <!-- Username field (only for signup) -->
+                    <div id="usernameWrap" class="hidden">
+                        <label class="text-xs uppercase tracking-widest text-zinc-400 mb-2 block">Username</label>
+                        <input id="username" type="text" placeholder="Username" class="uf">
+                    </div>
+
+                    <div>
+                        <label class="text-xs uppercase tracking-widest text-zinc-400 mb-2 block">Email Address</label>
+                        <input id="email" type="email" placeholder="Enter a valid Email" class="uf">
+                    </div>
+
+                    <div class="relative">
+                        <label class="text-xs uppercase tracking-widest text-zinc-400 mb-2 block">Password</label>
+                        <input id="password" type="password" placeholder="Enter a Strong Password" class="uf pr-12">
+                        <button onclick="togglePw()" class="absolute right-4 top-10 text-zinc-400 hover:text-white">
+                            <i id="pwEyeIcon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <div id="confirmWrap" class="hidden">
+                        <label class="text-xs uppercase tracking-widest text-zinc-400 mb-2 block">Confirm Password</label>
+                        <input id="confirmPassword" type="password" placeholder="••••••••" class="uf">
+                    </div>
+
+                    <div id="signinExtras" class="flex justify-between items-center text-sm">
+                        <label onclick="toggleRemember()" class="flex items-center gap-3 cursor-pointer select-none">
+                            <span id="rememberBox" class="checkbox-custom">
+                                <i id="rememberCheck" class="fa-solid fa-check text-xs hidden"></i>
+                            </span>
+                            <span class="text-zinc-400">Keep me signed in</span>
+                        </label>
+                        <button onclick="handleForgotPassword()" class="text-emerald-400 hover:text-emerald-300">Forgot password?</button>
+                    </div>
+
+                    <button id="submitBtn" onclick="handleSubmit()" 
+                            class="btn-primary w-full py-6 rounded-3xl font-semibold text-lg tracking-wide flex items-center justify-center gap-3">
+                        <span id="submitLabel">SIGN IN</span>
+                    </button>
+
+                    <p class="text-center text-zinc-400 text-sm">
+                        <span id="switchPrompt">Don't have an account?</span> 
+                        <button onclick="switchTab(window.currentMode === 'signin' ? 'signup' : 'signin')" 
+                                id="switchAction" class="text-emerald-400 hover:underline font-medium">Sign up</button>
+                    </p>
+                </div>
             </div>
         </div>
-
-        <div id="devicesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
 
-    <!-- Add Device Modal -->
-    <div id="addModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div class="glass rounded-3xl p-10 w-full max-w-md mx-4">
-            <h2 class="text-3xl font-bold mb-8">Add New Device</h2>
-            <input id="deviceName" type="text" placeholder="Device Name" class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 mb-6 text-lg focus:outline-none focus:border-emerald-500">
-            
-            <select id="deviceType" class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 mb-6 text-lg focus:outline-none focus:border-emerald-500">
-                <option value="led">LED / Light</option>
-                <option value="fan">Fan</option>
-                <option value="other">Other Device</option>
-            </select>
-
-            <select id="gpioPin" class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 mb-8 text-lg focus:outline-none focus:border-emerald-500">
-                <option value="2">GPIO 2</option>
-                <option value="4">GPIO 4</option>
-                <option value="5">GPIO 5</option>
-                <option value="12">GPIO 12</option>
-                <option value="13">GPIO 13</option>
-                <option value="14">GPIO 14</option>
-                <option value="15">GPIO 15</option>
-                <option value="16">GPIO 16</option>
-                <option value="17">GPIO 17</option>
-                <option value="18">GPIO 18</option>
-                <option value="19">GPIO 19</option>
-                <option value="21">GPIO 21</option>
-                <option value="22">GPIO 22</option>
-                <option value="23">GPIO 23</option>
-                <option value="25">GPIO 25</option>
-                <option value="26">GPIO 26</option>
-                <option value="27">GPIO 27</option>
-            </select>
-
-            <div class="flex gap-4">
-                <button onclick="hideAddModal()" class="flex-1 py-6 bg-zinc-800 hover:bg-zinc-700 rounded-3xl font-medium text-lg">Cancel</button>
-                <button onclick="addNewDevice()" class="flex-1 py-6 bg-emerald-600 hover:bg-emerald-500 rounded-3xl font-semibold text-lg">Add Device</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="wifiModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div class="glass rounded-3xl p-10 w-full max-w-md mx-4">
-            <h2 class="text-3xl font-bold mb-8">WiFi Configuration</h2>
-            <input id="wifiSSID" type="text" placeholder="WiFi SSID (Network Name)" class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 mb-6 text-lg">
-            <div class="relative mb-8">
-                <input id="wifiPassword" type="password" placeholder="WiFi Password" 
-                class="w-full bg-zinc-900/80 border border-white/10 rounded-3xl px-6 py-6 pr-12 text-lg">
-                <button type="button" onclick="togglePassword()" 
-                class="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white">
-            <i id="eyeIcon" class="fa-solid fa-eye"></i>
-            </button>
-        </div>
-            <div class="flex gap-4">
-                <button onclick="hideWifiModal()" class="flex-1 py-6 bg-zinc-800 hover:bg-zinc-700 rounded-3xl font-medium text-lg">Cancel</button>
-                <button onclick="saveWifiConfig()" class="flex-1 py-6 bg-amber-600 hover:bg-amber-500 rounded-3xl font-semibold text-lg">Save & Connect</button>
-            </div>
-            <p class="text-center text-sm text-zinc-500 mt-6">ESP32 will restart and connect to new network</p>
-        </div>
-    </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, remove, push } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
-        import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            sendPasswordResetEmail,
+            setPersistence,
+            browserLocalPersistence,
+            browserSessionPersistence,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDtpaYow0i1rPZyvVPJj9nBsj36GgA5c68",
@@ -142,215 +181,152 @@
             appId: "1:374399284490:web:1083398487db54421cf6f3"
         };
 
-
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
         const auth = getAuth(app);
-        const devicesRef = ref(db, "devices");
 
-        const devicesList = document.getElementById('devicesList');
+        let currentMode = 'signin';
+        let rememberMe = true;
+        let isSubmitting = false;
+        window.currentMode = currentMode;
 
+        window.switchTab = (target) => {
+            currentMode = target;
+            window.currentMode = target;
 
-        let unsubscribeDevices = null;
+            const usernameWrap = document.getElementById('usernameWrap');
+            const confirmWrap = document.getElementById('confirmWrap');
+            const signinExtras = document.getElementById('signinExtras');
+            const submitLabel = document.getElementById('submitLabel');
+            const switchPrompt = document.getElementById('switchPrompt');
+            const switchAction = document.getElementById('switchAction');
 
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = "login.html";
+            if (target === 'signin') {
+                usernameWrap.classList.add('hidden');
+                confirmWrap.classList.add('hidden');
+                signinExtras.classList.remove('hidden');
+                submitLabel.textContent = 'SIGN IN';
+                switchPrompt.textContent = "Don't have an account?";
+                switchAction.textContent = 'Sign up';
+            } else {
+                usernameWrap.classList.remove('hidden');
+                confirmWrap.classList.remove('hidden');
+                signinExtras.classList.add('hidden');
+                submitLabel.textContent = 'SIGN UP';
+                switchPrompt.textContent = 'Already have an account?';
+                switchAction.textContent = 'Sign in';
+            }
+            hideMsg();
+        };
+
+        window.togglePw = () => {
+            const pwField = document.getElementById('password');
+            const icon = document.getElementById('pwEyeIcon');
+            const isPw = pwField.type === 'password';
+            pwField.type = isPw ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        };
+
+        window.toggleRemember = () => {
+            rememberMe = !rememberMe;
+            const box = document.getElementById('rememberBox');
+            const check = document.getElementById('rememberCheck');
+            box.classList.toggle('checked', rememberMe);
+            check.classList.toggle('hidden', !rememberMe);
+        };
+
+        function showMsg(text, type = 'error') {
+            const el = document.getElementById('authMsg');
+            el.textContent = text;
+            el.className = `mb-6 px-5 py-4 rounded-2xl text-sm font-medium ${
+                type === 'error' 
+                ? 'bg-red-500/10 border border-red-500/30 text-red-400' 
+                : 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+            }`;
+            el.classList.remove('hidden');
+        }
+
+        function hideMsg() {
+            document.getElementById('authMsg').classList.add('hidden');
+        }
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = isLoading;
+            btn.innerHTML = isLoading 
+                ? `<span class="flex items-center justify-center"><i class="fa-solid fa-spinner fa-spin mr-3"></i>PLEASE WAIT...</span>`
+                : `<span id="submitLabel">${currentMode === 'signin' ? 'SIGN IN' : 'SIGN UP'}</span>`;
+        }
+
+        window.handleSubmit = async () => {
+            hideMsg();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const username = document.getElementById('username').value.trim();
+
+            if (!email || !password) {
+                showMsg('Please enter both email and password.');
                 return;
             }
-            const displayName = user.displayName || user.email.split('@')[0];
-            document.getElementById('userWelcome').textContent = `Welcome back, ${displayName}`;
 
-            window.editUsername = () => {
-                const current = auth.currentUser.displayName || '';
-                const newName = prompt("Enter your username:", current);
-                if (newName !== null && newName.trim()) {
-                    updateProfile(auth.currentUser, { displayName: newName.trim() }).then(() => {
-                        document.getElementById('userWelcome').textContent = `Welcome back, ${newName.trim()}`;
+            if (currentMode === 'signup') {
+                if (!username) {
+                    showMsg('Please choose a username.');
+                    return;
+                }
+                const confirm = document.getElementById('confirmPassword').value;
+                if (password !== confirm) {
+                    showMsg('Passwords do not match.');
+                    return;
+                }
+            }
+
+            setLoading(true);
+            isSubmitting = true;
+            try {
+                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+                
+                if (currentMode === 'signin') {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    // Update display name BEFORE navigating away
+                    await updateProfile(userCredential.user, {
+                        displayName: username
                     });
                 }
-            };
-            if (!unsubscribeDevices) {
-                unsubscribeDevices = onValue(devicesRef, updateDevices);
+                window.location.href = "index_claude.html";
+            } catch (err) {
+                isSubmitting = false;
+                setLoading(false);
+                showMsg(err.message || 'Something went wrong. Please try again.');
             }
-        });
-
-        window.handleLogout = () => {
-            if (unsubscribeDevices) {
-                unsubscribeDevices();
-                unsubscribeDevices = null;
-            }
-            signOut(auth);
         };
 
-        function createDeviceCard(key, data) {
-            const isOn = data?.status === 1;
-            const voltage = data?.voltage ?? 100;
-            let icon = 'fa-lightbulb';
-            if (data?.type === 'fan') icon = 'fa-fan';
-            else if (data?.type === 'other') icon = 'fa-bolt';
-
-            return `
-                <div class="device-card glass rounded-3xl p-7">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="flex items-center gap-5">
-                            <i class="fa-solid ${icon} text-5xl ${isOn ? 'text-[#2CFF05]' : 'text-slate-400'}"></i>
-                            <div>
-                                <div class="font-semibold text-2xl">${data?.name || 'Unnamed Device'}</div>
-                                <div class="text-emerald-400/70 text-sm tracking-wider">${data?.type?.toUpperCase() || 'DEVICE'}</div>
-                                <div class="text-[10px] text-zinc-400 mt-1">GPIO ${data?.pin ?? 'N/A'}</div>
-                            </div>
-                        </div>
-                        <button onclick="deleteDevice('${key}')" class="text-red-400 hover:text-red-500 text-2xl p-3">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-
-                    <!-- Power Toggle -->
-                    <div onclick="toggleDevice('${key}', ${isOn ? 1 : 0})" 
-                         class="cursor-pointer mb-8 bg-zinc-950 hover:bg-zinc-900 rounded-3xl p-6 flex items-center justify-between text-xl font-semibold">
-                        <span class="${isOn ? 'text-[#2CFF05]' : 'text-zinc-500'}">
-                            ${isOn ? '🟢 POWER ON' : '⚪ POWER OFF'}
-                        </span>
-                        <div class="toggle-track w-14 h-8 bg-zinc-700 rounded-full relative ${isOn ? 'track-on' : ''}">
-                            <div class="toggle-knob absolute top-1 w-6 h-6 bg-white rounded-full shadow-lg transition-all 
-                                 ${isOn ? 'right-1 knob-on' : 'left-1 bg-zinc-400'}"></div>
-                        </div>
-                    </div>
-
-                    <!-- Voltage Control -->
-                    <div>
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-zinc-400 text-sm tracking-wider">INTENSITY</span>
-                            <span onclick="editVoltage('${key}', this)" id="volt-${key}" 
-                                  class="font-mono text-xl font-semibold text-emerald-400 cursor-pointer hover:text-emerald-300">
-                                ${voltage}%
-                            </span>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <button onclick="adjustVoltage('${key}', -5)" class="w-11 h-11 bg-zinc-800 hover:bg-red-600 rounded-2xl text-2xl font-bold">-</button>
-                            <input type="range" id="slider-${key}" min="0" max="100" value="${voltage}" step="1" class="flex-1 accent-[#2CFF05] cursor-pointer">
-                            <button onclick="adjustVoltage('${key}', 5)" class="w-11 h-11 bg-zinc-800 hover:bg-[#305CDE] rounded-2xl text-2xl font-bold">+</button>
-                        </div>
-                    </div>
-                </div>`;
-        }
-
-        function updateDevices(snapshot) {
-            devicesList.innerHTML = "";
-            const devices = snapshot.val() || {};
-
-            if (Object.keys(devices).length === 0) {
-                devicesList.innerHTML = `<div class="text-center py-32 text-zinc-500 col-span-full">No devices yet.<br>Click ADD DEVICE</div>`;
+        window.handleForgotPassword = async () => {
+            hideMsg();
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                showMsg('Please enter your email first.');
                 return;
             }
-
-            Object.entries(devices).forEach(([key, data]) => {
-                devicesList.innerHTML += createDeviceCard(key, data);
-                setTimeout(() => attachSliderListener(key), 50);
-            });
-        }
-
-        function attachSliderListener(key) {
-            const slider = document.getElementById(`slider-${key}`);
-            if (slider) slider.addEventListener('input', () => updateVoltage(key, slider.value));
-        }
-
-        window.updateVoltage = (key, value) => {
-            set(ref(db, `devices/${key}/voltage`), parseInt(value));
-            const voltEl = document.getElementById(`volt-${key}`);
-            if (voltEl) voltEl.textContent = value + "%";
-        };
-
-        window.adjustVoltage = (key, change) => {
-            const el = document.getElementById(`volt-${key}`);
-            let current = parseInt(el.textContent);
-            if (isNaN(current)) {
-                current = 100;
-            }
-            let newVal = Math.max(0, Math.min(100, current + change));
-            updateVoltage(key, newVal);
-            const slider = document.getElementById(`slider-${key}`);
-            if (slider) slider.value = newVal;
-        };
-
-        window.editVoltage = (key, el) => {
-            let current = parseInt(el.textContent);
-            if(isNaN(current)){
-                current = 100;
-            }
-            const newVal = prompt("Enter intensity (0-100):", current);
-            if (newVal !== null) {
-                let value = parseInt(newVal);
-                if (!isNaN(value)) {
-                    value = Math.max(0, Math.min(100, value));
-                    updateVoltage(key, value);
-                    const slider = document.getElementById(`slider-${key}`);
-                    if (slider) slider.value = value;
-                }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMsg('Password reset email sent. Check your inbox.', 'success');
+            } catch (err) {
+                showMsg(err.message);
             }
         };
 
-        window.toggleDevice = (key, current) => set(ref(db, `devices/${key}/status`), current === 1 ? 0 : 1);
-        
-        window.addNewDevice = () => {
-            const name = document.getElementById('deviceName').value.trim();
-            if (!name) return alert("Please enter device name");
-            
-            const newRef = push(devicesRef);
-            set(newRef, {
-                name: name,
-                type: document.getElementById('deviceType').value,
-                pin: parseInt(document.getElementById('gpioPin').value),
-                status: 0,
-                voltage: 100
-            }).then(() => {
-                hideAddModal();
-                document.getElementById('deviceName').value = '';
-            });
+        window.onload = () => {
+            toggleRemember();
         };
 
-        // ================== WiFi Configuration ==================
-        let passwordVisible = false;
-
-        window.togglePassword = () => {
-            const passwordField = document.getElementById('wifiPassword');
-            const eyeIcon = document.getElementById('eyeIcon');
-            passwordVisible = !passwordVisible;
-            if (passwordVisible) {
-                passwordField.type = "text";
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
+        onAuthStateChanged(auth, (user) => {
+            if (user && !isSubmitting) {
+                window.location.href = "index.html";
             }
-            else{
-                passwordField.type = "password";
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            }
-        };
-        window.showWifiModal = () => document.getElementById('wifiModal').classList.remove('hidden');
-        window.hideWifiModal = () => document.getElementById('wifiModal').classList.add('hidden');
-
-        window.saveWifiConfig = () => {
-            const ssid = document.getElementById('wifiSSID').value.trim();
-            const pass = document.getElementById('wifiPassword').value.trim();
-            
-            if (!ssid) return alert("Please enter WiFi SSID");
-
-            const wifiRef = ref(db, "wifiConfig");
-            set(wifiRef, {
-                ssid: ssid,
-                password: pass,
-                updatedAt: Date.now()
-            }).then(() => {
-                alert("✅ WiFi settings saved! ESP32 will restart and connect to new network.");
-                hideWifiModal();
-            }).catch(err => alert("Error saving WiFi config"));
-        };
-
-        window.deleteDevice = (key) => { if(confirm("Delete this device?")) remove(ref(db, `devices/${key}`)); };
-        window.showAddModal = () => document.getElementById('addModal').classList.remove('hidden');
-        window.hideAddModal = () => document.getElementById('addModal').classList.add('hidden');
+        });
     </script>
 </body>
 </html>
