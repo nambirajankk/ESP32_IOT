@@ -50,6 +50,15 @@
             transform: translateY(-2px);
             box-shadow: 0 20px 25px -5px rgb(16 185 129 / 0.4);
         }
+        .btn-google {
+            background: white;
+            color: #1f2937;
+            transition: all 0.3s ease;
+        }
+        .btn-google:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(255 255 255 / 0.15);
+        }
         .checkbox-custom {
             width: 20px; height: 20px;
             border: 2px solid #64748b;
@@ -132,6 +141,19 @@
                             class="btn-primary w-full py-6 rounded-3xl font-semibold text-lg tracking-wide flex items-center justify-center gap-3">
                         <span id="submitLabel">SIGN IN</span>
                     </button>
+
+                    <div class="flex items-center gap-4 text-zinc-500 text-xs">
+                        <div class="flex-1 h-px bg-zinc-700"></div>
+                        OR
+                        <div class="flex-1 h-px bg-zinc-700"></div>
+                    </div>
+
+                    <button id="googleBtn" onclick="handleGoogleSignIn()"
+                            class="btn-google w-full py-6 rounded-3xl font-semibold text-lg tracking-wide flex items-center justify-center gap-3">
+                        <i class="fa-brands fa-google"></i>
+                        <span id="googleLabel">Continue with Google</span>
+                    </button>
+
                     <p class="text-center text-zinc-400 text-sm">
                         <span id="switchPrompt">Don't have an account?</span>
                         <button onclick="switchTab(window.currentMode === 'signin' ? 'signup' : 'signin')"
@@ -153,7 +175,9 @@
             setPersistence,
             browserLocalPersistence,
             browserSessionPersistence,
-            updateProfile
+            updateProfile,
+            GoogleAuthProvider,
+            signInWithPopup
         } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -168,9 +192,11 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
 
         let currentMode = 'signin';
         let rememberMe = true;
+        let isSubmitting = false;
         window.currentMode = currentMode;
 
         window.switchTab = (target) => {
@@ -240,6 +266,14 @@
                 : `<span id="submitLabel">${currentMode === 'signin' ? 'SIGN IN' : 'SIGN UP'}</span>`;
         }
 
+        function setGoogleLoading(isLoading) {
+            const btn = document.getElementById('googleBtn');
+            btn.disabled = isLoading;
+            btn.innerHTML = isLoading
+                ? `<span class="flex items-center justify-center"><i class="fa-solid fa-spinner fa-spin mr-3"></i>PLEASE WAIT...</span>`
+                : `<i class="fa-brands fa-google"></i><span id="googleLabel">Continue with Google</span>`;
+        }
+
         window.handleSubmit = async () => {
             hideMsg();
             const email = document.getElementById('email').value.trim();
@@ -264,6 +298,7 @@
             }
 
             setLoading(true);
+            isSubmitting = true;
             try {
                 await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
                 
@@ -275,8 +310,24 @@
                 }
                 window.location.href = "index.html";
             } catch (err) {
+                isSubmitting = false;
                 setLoading(false);
                 showMsg(err.message || 'Something went wrong.');
+            }
+        };
+
+        window.handleGoogleSignIn = async () => {
+            hideMsg();
+            setGoogleLoading(true);
+            isSubmitting = true;
+            try {
+                await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+                await signInWithPopup(auth, googleProvider);
+                window.location.href = "index.html";
+            } catch (err) {
+                isSubmitting = false;
+                setGoogleLoading(false);
+                showMsg(err.message || 'Google sign-in failed. Please try again.');
             }
         };
 
@@ -295,7 +346,7 @@
         window.onload = () => toggleRemember();
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {
+            if (user && !isSubmitting) {
                 window.location.href = "index.html";
             }
         });
