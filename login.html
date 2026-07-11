@@ -177,7 +177,11 @@
             browserSessionPersistence,
             updateProfile,
             GoogleAuthProvider,
-            signInWithPopup
+            signInWithPopup,
+            getAdditionalUserInfo,
+            deleteUser,
+            signOut,
+            sendEmailVerification
         } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -301,14 +305,32 @@
             isSubmitting = true;
             try {
                 await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
-                
+
                 if (currentMode === 'signin') {
-                    await signInWithEmailAndPassword(auth, email, password);
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+                    if (!userCredential.user.emailVerified) {
+                        await sendEmailVerification(userCredential.user);
+                        await signOut(auth);
+                        isSubmitting = false;
+                        setLoading(false);
+                        showMsg(`Your email isn't verified yet. We've sent a new confirmation link to ${email} — please check your inbox.`);
+                        return;
+                    }
+
+                    window.location.href = "index.html";
                 } else {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     await updateProfile(userCredential.user, { displayName: username });
+                    await sendEmailVerification(userCredential.user);
+                    await signOut(auth);
+
+                    isSubmitting = false;
+                    setLoading(false);
+                    showMsg('Account created! Please check your email and click the confirmation link before signing in.', 'success');
+                    switchTab('signin');
+                    return;
                 }
-                window.location.href = "index.html";
             } catch (err) {
                 isSubmitting = false;
                 setLoading(false);
@@ -322,7 +344,17 @@
             isSubmitting = true;
             try {
                 await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
-                await signInWithPopup(auth, googleProvider);
+                const result = await signInWithPopup(auth, googleProvider);
+
+                const isNewUser = getAdditionalUserInfo(result)?.isNewUser;
+                if (isNewUser) {
+                    await deleteUser(result.user);
+                    isSubmitting = false;
+                    setGoogleLoading(false);
+                    showMsg("No account found for this Google account. Please sign up first.");
+                    return;
+                }
+
                 window.location.href = "index.html";
             } catch (err) {
                 isSubmitting = false;
@@ -343,7 +375,13 @@
             }
         };
 
-        window.onload = () => toggleRemember();
+        window.onload = () => {
+            toggleRemember();
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('unverified')) {
+                showMsg("Please verify your email before signing in.");
+            }
+        };
 
         onAuthStateChanged(auth, (user) => {
             if (user && !isSubmitting) {
