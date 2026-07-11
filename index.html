@@ -156,6 +156,12 @@
                 window.location.href = "login.html";
                 return;
             }
+            if (!user.emailVerified) {
+                signOut(auth).then(() => {
+                    window.location.href = "login.html?unverified=1";
+                });
+                return;
+            }
             const displayName = user.displayName || user.email.split('@')[0];
             document.getElementById('userWelcome').textContent = `Welcome back, ${displayName}`;
 
