@@ -51,13 +51,16 @@
             box-shadow: 0 20px 25px -5px rgb(16 185 129 / 0.4);
         }
         .btn-google {
-            background: white;
-            color: #1f2937;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            color: #e5e7eb;
             transition: all 0.3s ease;
         }
         .btn-google:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgb(255 255 255 / 0.15);
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(148, 163, 184, 0.4);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3);
         }
         .checkbox-custom {
             width: 20px; height: 20px;
@@ -79,7 +82,7 @@
     <div class="min-h-screen flex items-center justify-center p-6">
         <div class="glass rounded-3xl overflow-hidden w-full max-w-4xl grid md:grid-cols-2 shadow-2xl">
             <!-- Left Panel -->
-            <div class="glass-left p-12 md:p-16 flex flex-col justify-between">
+            <div class="glass-left p-12 md:p-16 flex flex-col">
                 <div>
                     <div class="flex items-center gap-3 mb-10">
                         <i class="fa-solid fa-bolt text-emerald-400 text-4xl"></i>
@@ -88,7 +91,7 @@
                     <h2 class="text-4xl font-semibold leading-tight mb-4">Welcome back,<br>Explorer.</h2>
                     <p class="text-emerald-400/70 text-lg">Sign in to access your intelligent control system.</p>
                 </div>
-                <div class="space-y-6 mt-12">
+                <div class="space-y-6 mt-10 md:mt-16">
                     <div class="flex items-center gap-4 text-emerald-400/80">
                         <i class="fa-solid fa-microchip text-xl"></i>
                         <span class="text-sm">Real-time device synchronization</span>
@@ -142,17 +145,24 @@
                         <span id="submitLabel">SIGN IN</span>
                     </button>
 
-                    <div class="flex items-center gap-4 text-zinc-500 text-xs">
-                        <div class="flex-1 h-px bg-zinc-700"></div>
-                        OR
-                        <div class="flex-1 h-px bg-zinc-700"></div>
-                    </div>
+                    <div id="googleSection">
+                        <div class="flex items-center gap-4 text-zinc-500 text-xs mb-8">
+                            <div class="flex-1 h-px bg-zinc-700"></div>
+                            OR
+                            <div class="flex-1 h-px bg-zinc-700"></div>
+                        </div>
 
-                    <button id="googleBtn" onclick="handleGoogleSignIn()"
-                            class="btn-google w-full py-6 rounded-3xl font-semibold text-lg tracking-wide flex items-center justify-center gap-3">
-                        <i class="fa-brands fa-google"></i>
-                        <span id="googleLabel">Continue with Google</span>
-                    </button>
+                        <button id="googleBtn" onclick="handleGoogleSignIn()"
+                                class="btn-google w-full py-6 rounded-3xl font-semibold text-lg tracking-wide flex items-center justify-center gap-3">
+                            <svg width="22" height="22" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                                <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+                                <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+                                <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
+                                <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+                            </svg>
+                            <span id="googleLabel">Continue with Google</span>
+                        </button>
+                    </div>
 
                     <p class="text-center text-zinc-400 text-sm">
                         <span id="switchPrompt">Don't have an account?</span>
@@ -213,6 +223,7 @@
             const submitLabel = document.getElementById('submitLabel');
             const switchPrompt = document.getElementById('switchPrompt');
             const switchAction = document.getElementById('switchAction');
+            const googleSection = document.getElementById('googleSection');
 
             if (target === 'signin') {
                 usernameWrap.classList.add('hidden');
@@ -221,6 +232,7 @@
                 submitLabel.textContent = 'SIGN IN';
                 switchPrompt.textContent = "Don't have an account?";
                 switchAction.textContent = 'Sign up';
+                googleSection.classList.remove('hidden');
             } else {
                 usernameWrap.classList.remove('hidden');
                 confirmWrap.classList.remove('hidden');
@@ -228,6 +240,7 @@
                 submitLabel.textContent = 'SIGN UP';
                 switchPrompt.textContent = 'Already have an account?';
                 switchAction.textContent = 'Sign in';
+                googleSection.classList.add('hidden');
             }
             hideMsg();
         };
