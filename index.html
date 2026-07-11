@@ -125,6 +125,21 @@
             <p class="text-center text-sm text-zinc-500 mt-6">ESP32 will restart and connect to new network</p>
         </div>
     </div>
+    <!-- Logout Confirm Modal -->
+    <div id="logoutModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+        <div class="glass rounded-3xl p-10 w-full max-w-sm mx-4 text-center">
+            <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
+                <i class="fa-solid fa-right-from-bracket text-red-400 text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-3">Log out?</h2>
+            <p class="text-zinc-400 mb-8">You'll need to sign in again to access your devices.</p>
+            <div class="flex gap-4">
+                <button onclick="hideLogoutModal()" class="flex-1 py-5 bg-zinc-800 hover:bg-zinc-700 rounded-3xl font-medium text-lg">Cancel</button>
+                <button onclick="confirmLogout()" class="flex-1 py-5 bg-red-600 hover:bg-red-500 rounded-3xl font-semibold text-lg">Log Out</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, remove, push } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
@@ -180,6 +195,14 @@
         });
 
         window.handleLogout = () => {
+            document.getElementById('logoutModal').classList.remove('hidden');
+        };
+
+        window.hideLogoutModal = () => {
+            document.getElementById('logoutModal').classList.add('hidden');
+        };
+
+        window.confirmLogout = () => {
             if (unsubscribeDevices) {
                 unsubscribeDevices();
                 unsubscribeDevices = null;
